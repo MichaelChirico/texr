@@ -6,22 +6,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
                        label = NULL, digits = NULL,
                        caption = NULL, hline.after = integer(0L),
                        vline.after = integer(0L), na.char = "",
-                       file = "") {
-  # * could auto-label by using internal counter
-  #   to say which # call to tex() this is since loading
-  # * need to add sidewaystable support
-  #     * how to deal with required package? plan for now:
-  #       give a warning message. perhaps allow this to
-  #       be toggled via an option, or perhaps just print
-  #       this warning once per session.
-  # * need to add [htbp] alignment support
-  # * need to add tests of everything
-  # * need to support different caption placement
-  # * could add argument to change what appears
-  #   in the empty top left cell when both column
-  #   and row names are used
-  # * note for manual: hline.after can be specified out
-  #   of order; duplicates are ignored; same for vline.after
+                       file = "", placement = "") {
   use.col <- isTRUE(use.dims) || use.dims == "col"
   if (is.null(coln <- colnames(x))) coln <- 1L:ncol(x)
   use.row <- isTRUE(use.dims) || use.dims == "row"
@@ -54,6 +39,11 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
   if (is.null(caption)) 
     caption <- paste("Matrix:", as.character(substitute(x)))
   if (is.null(label)) label <- "tbl:x"
+  if (!all((placement_spl <- strsplit(placement, split = "")[[1L]]) %in% 
+           c("!", "h", "t", "b", "p")))
+    stop("Invalid float placement options: ",
+         paste(placement_spl[!placement_spl %in% c("!", "h", "t", "b", "p")],
+               collapse = ", ")
   
   mm <- nrow(x)
   MM <- nrow(x) + use.col
@@ -61,7 +51,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
   out[c(1L:5L, ll - 1L, ll)] <- 
-    c("\\begin{table}",
+    c("\\begin{table}[" %+% placement %+% "]"),
       "\\caption{" %+% caption %+% "}",
       "\\label{" %+% label %+% "}",
       "\\centering",
