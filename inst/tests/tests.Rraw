@@ -1,0 +1,13 @@
+#naming convention:
+#  function.feature/argument.number, e.g.
+#  tex.usedims.1
+
+test <- texr:::test
+
+m <- matrix(1:4, nrow = 2, ncol = 2)
+reset_label_count()
+test("texmatrix.VALUE.1", tex(m), 
+     c("\\begin{table}[]", "\\caption{Matrix: m}", 
+       "\\label{tbl:1}", "\\centering", "\\begin{tabular}{rrr}", 
+       " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
+       "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
