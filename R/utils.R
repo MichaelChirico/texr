@@ -4,6 +4,7 @@
 .global <- new.env()
 setPackageName("texr", .global)
 
-.global$label_count <- 0L #increments by 1 each `tex()` call
+#increments by 1 each `tex()` call
+.global$label_count <- getOption("texr.labelcount") 
 
 reset_label_count <- function(...) .global$label_count <- 0L

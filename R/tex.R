@@ -1,4 +1,4 @@
-tex <- function(x, ...) {
+tex <- function(...) {
   .global$label_count <- .global$label_count + 1L
   UseMethod("tex")
 }
