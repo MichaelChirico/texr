@@ -1,4 +1,5 @@
 tex <- function(x, ...) {
+  .global$label_count <- .global$label_count + 1L
   UseMethod("tex")
 }
 
@@ -22,28 +23,28 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
              "outside this table's range (",
              min(idv), ":", max(idv), ").",
              if (-1 %in% vline.after & !use.row) 
-               " Please use `use.dims = TRUE` or `use.dims = \"row\"")
+               " Please use `use.dims = TRUE` or `use.dims = \"row\"`")
       alignc <- character(2L * (ncol(x) + use.row) + 1L)
       alignc[seq(2L, length(alignc), by = 2L)] <- "r"
-      alignc[alignc == ""][which( %in%
-                                   vline.after)] <- "|"
+      alignc[alignc == ""][which(idv %in% vline.after)] <- "|"
     }
     align <- paste(alignc, collapse = "")
   } else {
     if (nchar(align) != ncol(x) + use.row)
-      stop("You specified ", nchar(align), " alignments for ", ncol(x) + use.row, " columns.")
+      stop("You specified ", nchar(align), " alignments for ", 
+           ncol(x) + use.row, " columns.")
     if (grepl("|", align, fixed = TRUE) & length(vline.after))
       warning("Attempt to specify vertical lines both with `vline.after` ",
               "and within `align`; ignoring `vline.after`")
   }
   if (is.null(caption)) 
     caption <- paste("Matrix:", as.character(substitute(x)))
-  if (is.null(label)) label <- "tbl:x"
-  if (!all((placement_spl <- strsplit(placement, split = "")[[1L]]) %in% 
+  if (is.null(label)) label <- "tbl:" %+% .global$label_count
+  if (!all(idx <- (placement_spl <- 
+            strsplit(placement, split = "", fixed = TRUE)[[1L]]) %in% 
            c("!", "h", "t", "b", "p")))
-    stop("Invalid float placement options: ",
-         paste(placement_spl[!placement_spl %in% c("!", "h", "t", "b", "p")],
-               collapse = ", ")
+    stop("Invalid float placement options: ", 
+         paste(placement_spl[!idx], collapse = ", "))
   
   mm <- nrow(x)
   MM <- nrow(x) + use.col
@@ -51,7 +52,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
   out[c(1L:5L, ll - 1L, ll)] <- 
-    c("\\begin{table}[" %+% placement %+% "]"),
+    c("\\begin{table}[" %+% placement %+% "]",
       "\\caption{" %+% caption %+% "}",
       "\\label{" %+% label %+% "}",
       "\\centering",
@@ -75,7 +76,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
              " Please use `use.dims = TRUE` or `use.dims = \"col\"")
     tbody <- character(2L * MM + 1L)
     tbody[seq(1L, length(tbody), by = 2L)
-          ][which(idc %in%hline.after)] <- "\\hline"
+          ][which(idc %in% hline.after)] <- "\\hline"
     tbody[seq(2L, length(tbody), by = 2L)] <- mrows
     tbody <- tbody[tbody != ""]
   } else 
