@@ -8,15 +8,19 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
                        caption = NULL, hline.after = integer(0L),
                        vline.after = integer(0L), na.char = "",
                        file = "", placement = "") {
-  nn <- ncol(x); mm <- nrow(x)
-  
-  use.col <- isTRUE(use.dims) || use.dims == "col"
-  NN <- nn + use.col
-  if (is.null(coln <- colnames(x))) coln <- 1L:nn
+  mm <- nrow(x)
+  nn <- ncol(x)
   
   use.row <- isTRUE(use.dims) || use.dims == "row"
-  MM <- mm + use.row
   if (is.null(rown <- rownames(x))) rown <- 1L:mm
+  
+  use.col <- isTRUE(use.dims) || use.dims == "col"
+  if (is.null(coln <- colnames(x))) coln <- 1L:nn
+
+  #number of (effective) ROWS increases when
+  #  use.col (and vice versa)
+  NN <- nn + use.row
+  MM <- mm + use.col
   
   if (is.null(align)) {
     alignc <- rep("r", NN)
@@ -26,8 +30,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
              if (length(idx <- which(!vline.after %in% idv)) > 1L) "s",
              " ", paste(idx, collapse = ","), 
              if (length(idx) > 1L) " are" else " is", 
-             " outside this table's range (",
-             min(idv), ":", max(idv), ").",
+             " outside this table's range (", min(idv), ":", max(idv), ").",
              if (-1 %in% vline.after & !use.row) 
                " Please use `use.dims = TRUE` or `use.dims = \"row\"`")
       alignc <- character(2L * NN + 1L)
@@ -53,6 +56,12 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
     stop("Invalid float placement options: ", 
          paste(unique(placement_spl[!idx]), collapse = ", "))
   
+  if (!is.null(digits)) {
+    if (is.numeric(x)) x <- round(x, digits = digits)
+    else warning("`", deparse(substitute(x)), "` is not numeric; ",
+                 "ignoring supplied `digits` argument.")
+  }
+  
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
@@ -73,8 +82,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
       stop("Row", if (length(idx <- which(!hline.after %in% idc)) > 1L) "s",
            " ", paste(idx, collapse = ","), 
            if (length(idx) > 1L) " are " else " is ", 
-           "outside this table's range (",
-           min(idc), ":", max(idc), ").",
+           "outside this table's range (", min(idc), ":", max(idc), ").",
            if (-1 %in% hline.after & !use.col) 
              " Please use `use.dims = TRUE` or `use.dims = \"col\"`")
     tbody <- character(2L * MM + 1L)
