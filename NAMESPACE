@@ -1,6 +1,6 @@
 export(tex)
 
-export(reset_label_count)
+export(reset_label_count, get_label_count)
 
 export(test.texr)
 

@@ -8,3 +8,5 @@ setPackageName("texr", .global)
 .global$label_count <- getOption("texr.labelcount") 
 
 reset_label_count <- function(...) .global$label_count <- 0L
+
+get_label_count <- function(...) .global$label_count

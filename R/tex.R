@@ -40,13 +40,13 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
               "and within `align`; ignoring `vline.after`")
   }
   if (is.null(caption)) 
-    caption <- paste("Matrix:", as.character(substitute(x)))
+    caption <- paste("Matrix:", deparse(substitute(x)))
   if (is.null(label)) label <- "tbl:" %+% .global$label_count
   if (!all(idx <- (placement_spl <- 
             strsplit(placement, split = "", fixed = TRUE)[[1L]]) %in% 
            c("!", "h", "t", "b", "p")))
     stop("Invalid float placement options: ", 
-         paste(placement_spl[!idx], collapse = ", "))
+         paste(unique(placement_spl[!idx]), collapse = ", "))
   
   mm <- nrow(x)
   MM <- nrow(x) + use.col
@@ -66,13 +66,13 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
   if (use.col) mrows <- c(paste0(if (use.row) " & ", .tex_row(coln)), mrows)
   if (length(hline.after)) {
     if (!all(hline.after %in% (idc <- (0L - use.col):mm)))
-      stop("Row", if (length(idx <- which(!vline.after %in% idv)) > 1L) "s",
-           paste(idx, collapse = ","), 
-           if (length(idx) > 1L) " are" else " is", 
+      stop("Row", if (length(idx <- which(!hline.after %in% idc)) > 1L) "s",
+           " ", paste(idx, collapse = ","), 
+           if (length(idx) > 1L) " are " else " is ", 
            "outside this table's range (",
            min(idc), ":", max(idc), ").",
            if (-1 %in% hline.after & !use.col) 
-             " Please use `use.dims = TRUE` or `use.dims = \"col\"")
+             " Please use `use.dims = TRUE` or `use.dims = \"col\"`")
     tbody <- character(2L * MM + 1L)
     tbody[seq(1L, length(tbody), by = 2L)
           ][which(idc %in% hline.after)] <- "\\hline"
