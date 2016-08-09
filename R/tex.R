@@ -3,18 +3,30 @@ tex <- function(...) {
   UseMethod("tex")
 }
 
-tex.matrix <- function(x, options = getOption("texr.params")) {
-  opt_names <- names(options)
-  if (!is.list(options) || is.null(opt_names) || any(opt_names == ""))
-    stop("`options` must be a named `list`")
-  if (any(ido <- !opt_names %in% .global$param_names)) 
-    warning("Option values not recognized: ", 
-            paste(opt_names[ido], collapse = ","))
-  #no need to evaluate `getOption` twice if `options` unchanged
-  if (!deparse(substitute(options)) == 'getOption("texr.params")') {
+tex.matrix <- function(x, options = getOption("texr.params"), ...) {
+  dots <- list(...)
+  if (length(dots)) {
+    if (!missing(options)) stop("Please use `options` alone or don't use it.")
+    
+    dot_names <- names(dots)
     opts <- getOption("texr.params")
-    opts[opt_names] <- options
-  } else { opts <- options }
+    if (any(ido <- !dot_names %in% .global$param_names)) 
+    warning("Option values not recognized: ", 
+            paste(dot_names[ido], collapse = ","))
+    opts[dot_names] <- dots
+  } else {
+    opt_names <- names(options)
+    if (!is.list(options) || is.null(opt_names) || any(opt_names == ""))
+      stop("`options` must be a named `list`")
+    if (any(ido <- !opt_names %in% .global$param_names)) 
+      warning("Option values not recognized: ", 
+              paste(opt_names[ido], collapse = ","))
+    #no need to evaluate `getOption` twice if `options` unchanged
+    if (!deparse(substitute(options)) == 'getOption("texr.params")') {
+      opts <- getOption("texr.params")
+      opts[opt_names] <- options
+    } else { opts <- options }
+  }
   for (oo in .global$param_names) assign(oo, opts[[oo]], envir = environment())
   
   mm <- nrow(x)

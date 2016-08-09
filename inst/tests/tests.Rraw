@@ -17,31 +17,31 @@ test("texmatrix.VALUE.1", tex(m),
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
    
 #test use.dims: accepts FALSE, "row", or "col"
-test("tex.usedims.1", tex(m, options = list(use.dims = FALSE)),
+test("tex.usedims.1", tex(m, use.dims = FALSE),
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:2}", 
        "\\centering", "\\begin{tabular}{rr}", "1 & 3 \\\\", "2 & 4 \\\\", 
        "\\end{tabular}", "\\end{table}"))
-test("tex.usedims.2", tex(m, options = list(use.dims = "row")),
+test("tex.usedims.2", tex(m, use.dims = "row"),
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:3}", 
        "\\centering", "\\begin{tabular}{rrr}", 
        "1 & 1 & 3 \\\\", "2 & 2 & 4 \\\\", 
        "\\end{tabular}", "\\end{table}"))
-test("tex.usedims.3", tex(m, options = list(use.dims = "col")),
+test("tex.usedims.3", tex(m, use.dims = "col"),
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:4}", 
        "\\centering", "\\begin{tabular}{rr}", "1 & 2 \\\\", "1 & 3 \\\\", 
        "2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
 
 #test align: check validity and functionality
-test("tex.align.1", tex(m, options = list(align = "lcr")),
+test("tex.align.1", tex(m, align = "lcr"),
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:5}", 
        "\\centering", "\\begin{tabular}{lcr}",
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
-test("tex.align.2", tex(m, options = list(align = "R&s")), error = "^Invalid")
-test("tex.align.3", tex(m, options = list(align = "rrrr")), error = "^You specified")
+test("tex.align.2", tex(m, align = "R&s"), error = "^Invalid")
+test("tex.align.3", tex(m, align = "rrrr"), error = "^You specified")
 
 #test label
-test("tex.label.1", tex(m, options = list(label = "tbl:mat")), 
+test("tex.label.1", tex(m, label = "tbl:mat"), 
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:mat}", 
        "\\centering", "\\begin{tabular}{rrr}", 
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
@@ -49,46 +49,46 @@ test("tex.label.1", tex(m, options = list(label = "tbl:mat")),
        
 #test digits: functionality and validity
 m.num <- matrix(1:4 * pi)
-test("tex.digits.1", tex(m.num, options = list(digits = 2L)),
+test("tex.digits.1", tex(m.num, digits = 2L),
      c("\\begin{table}[ht]", "\\caption{Matrix: m.num}", "\\label{tbl:9}", 
      "\\centering", "\\begin{tabular}{rr}", " & 1 \\\\", "1 & 3.14 \\\\", 
      "2 & 6.28 \\\\", "3 & 9.42 \\\\", "4 & 12.57 \\\\", "\\end{tabular}", 
      "\\end{table}"))
 m.log <- matrix(TRUE, nrow = 2, ncol = 2)
-test("tex.digits.2", tex(m.log, options = list(digits = 2L)), warning = "is not numeric")
+test("tex.digits.2", tex(m.log, digits = 2L), warning = "is not numeric")
 
 #test caption
-test("tex.caption.1", tex(m, options = list(caption = "Matrix Output")),
+test("tex.caption.1", tex(m, caption = "Matrix Output"),
      c("\\begin{table}[ht]", "\\caption{Matrix Output}", "\\label{tbl:11}", 
        "\\centering", "\\begin{tabular}{rrr}",
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
 
 #test hline.after: check validity and functionality
-test("tex.hlineafter.1", tex(m, options = list(hline.after = 0:2)),
+test("tex.hlineafter.1", tex(m, hline.after = 0:2),
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:12}", 
        "\\centering", "\\begin{tabular}{rrr}", " & 1 & 2 \\\\", "\\hline", 
        "1 & 1 & 3 \\\\", "\\hline", "2 & 2 & 4 \\\\",
        "\\hline", "\\end{tabular}", "\\end{table}"))
-test("tex.hlineafter.2", tex(m, options = list(hline.after = 6)), error = "^Row ")
-test("tex.hlineafter.3", tex(m, options = list(hline.after = 5:6)), error = "^Rows ")
-test("tex.hlineafter.4", tex(m, options = list(use.dims = FALSE, hline.after = -1)),
+test("tex.hlineafter.2", tex(m, hline.after = 6), error = "^Row ")
+test("tex.hlineafter.3", tex(m, hline.after = 5:6), error = "^Rows ")
+test("tex.hlineafter.4", tex(m, use.dims = FALSE, hline.after = -1),
      error = "Please use.*col")
 
 #test vline.after: check validity and functionality
-test("tex.vlineafter.1", tex(m, options = list(vline.after = 0:2)), 
+test("tex.vlineafter.1", tex(m, vline.after = 0:2), 
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:16}", 
        "\\centering", "\\begin{tabular}{r|r|r|}",
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
-test("tex.vlineafter.2", tex(m, options = list(vline.after = 6)), error = "^Column ")
-test("tex.vlineafter.3", tex(m, options = list(vline.after = 5:6)), error = "^Columns ")
-test("tex.vlineafter.4", tex(m, options = list(use.dims = FALSE, vline.after = -1)),
+test("tex.vlineafter.2", tex(m, vline.after = 6), error = "^Column ")
+test("tex.vlineafter.3", tex(m, vline.after = 5:6), error = "^Columns ")
+test("tex.vlineafter.4", tex(m, use.dims = FALSE, vline.after = -1),
      error = "Please use.*row")
      
 #test na.char
 m.na <- matrix(nrow = 2, ncol = 2)
-test("tex.nachar.1", tex(m.na, options = list(na.char = "NA")),
+test("tex.nachar.1", tex(m.na, na.char = "NA"),
      c("\\begin{table}[ht]", "\\caption{Matrix: m.na}", "\\label{tbl:20}", 
        "\\centering", "\\begin{tabular}{rrr}",
       " & 1 & 2 \\\\", "1 & NA & NA \\\\", 
@@ -96,7 +96,7 @@ test("tex.nachar.1", tex(m.na, options = list(na.char = "NA")),
 
 #test file
 ff <- tempfile()
-tex(m, options = list(file = ff))
+tex(m, file = ff)
 test("tex.file.1", readLines(ff), 
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:21}", 
        "\\centering", "\\begin{tabular}{rrr}", 
@@ -104,37 +104,44 @@ test("tex.file.1", readLines(ff),
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
        
 #test placement: validity and functionality
-test("tex.placement.1", tex(m, options = list(placement = "!htbp")),
+test("tex.placement.1", tex(m, placement = "!htbp"),
      c("\\begin{table}[!htbp]", "\\caption{Matrix: m}", "\\label{tbl:22}", 
        "\\centering", "\\begin{tabular}{rrr}",
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
-test("tex.placement.2", tex(m, options = list(placement = "xxxx")), 
+test("tex.placement.2", tex(m, placement = "xxxx"), 
      error = "^Invalid float")
      
-#test validity of options
-test("tex.options.1", tex(m, options = c(1, 2, 3)), error = "must be a named")
-test("tex.options.2", tex(m, options = list(1, 2, 3)), error = "must be a named")
-test("tex.options.3", tex(m, options = list(label = "lbl", 3)), error = "must be a named")
-test("tex.options.4", tex(m, options = list(xxx = 4)), warning = "not recognized")
+#test options: validity and functionality
+test("tex.options.1", tex(m, options = list(label = "lbl", caption = "hello",
+                                            caption.placement = "bottom")),
+     c("\\begin{table}[ht]", "\\centering", "\\begin{tabular}{rrr}", 
+       " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", "2 & 2 & 4 \\\\", "\\end{tabular}", 
+       "\\caption{hello}", "\\label{lbl}", "\\end{table}"))
+test("tex.options.2", tex(m, options = c(1, 2, 3)), error = "must be a named")
+test("tex.options.3", tex(m, options = list(1, 2, 3)), error = "must be a named")
+test("tex.options.4", tex(m, options = list(label = "lbl", 3)), error = "must be a named")
+test("tex.options.5", tex(m, options = list(xxx = 4)), warning = "not recognized")
+test("tex.options.6", tex(m, options = list(label = "lbl"), caption = "hello"),
+     error = "Please.*alone")
 
 #test caption.placement: validity and functionality
-test("tex.captionplacement.1", tex(m, options = list(caption.placement = "bottom")),
+test("tex.captionplacement.1", tex(m, caption.placement = "bottom"),
      c("\\begin{table}[ht]", "\\centering", "\\begin{tabular}{rrr}", 
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\",
        "2 & 2 & 4 \\\\", "\\end{tabular}", 
-       "\\caption{Matrix: m}", "\\label{tbl:28}", "\\end{table}"))
-test("tex.captionplacement.2", tex(m, options = list(caption.placement = "below")),
+       "\\caption{Matrix: m}", "\\label{tbl:30}", "\\end{table}"))
+test("tex.captionplacement.2", tex(m, caption.placement = "below"),
      c("\\begin{table}[ht]", "\\centering", "\\begin{tabular}{rrr}", 
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\",
        "2 & 2 & 4 \\\\", "\\end{tabular}", 
-       "\\caption{Matrix: m}", "\\label{tbl:29}", "\\end{table}"))
-test("tex.captionplacement.3", tex(m, options = list(caption.placement = "top")),
-     c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:30}", 
+       "\\caption{Matrix: m}", "\\label{tbl:31}", "\\end{table}"))
+test("tex.captionplacement.3", tex(m, caption.placement = "top"),
+     c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:32}", 
        "\\centering", "\\begin{tabular}{rrr}", 
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
-test("tex.captionplacement.4", tex(m, options = list(caption.placement = "xxx")),
+test("tex.captionplacement.4", tex(m, caption.placement = "xxx"),
      error = "Invalid.*caption\\.placement")
      
 # ***TESTS OF reset_label_count, get_label_count***
