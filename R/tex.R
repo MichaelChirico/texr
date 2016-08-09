@@ -8,14 +8,20 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
                        caption = NULL, hline.after = integer(0L),
                        vline.after = integer(0L), na.char = "",
                        file = "", placement = "") {
+  nn <- ncol(x); mm <- nrow(x)
+  
   use.col <- isTRUE(use.dims) || use.dims == "col"
-  if (is.null(coln <- colnames(x))) coln <- 1L:ncol(x)
+  NN <- nn + use.col
+  if (is.null(coln <- colnames(x))) coln <- 1L:nn
+  
   use.row <- isTRUE(use.dims) || use.dims == "row"
-  if (is.null(rown <- rownames(x))) rown <- 1L:nrow(x)
+  MM <- mm + use.row
+  if (is.null(rown <- rownames(x))) rown <- 1L:mm
+  
   if (is.null(align)) {
-    alignc <- rep("r", ncol(x) + use.row)
+    alignc <- rep("r", NN)
     if (length(vline.after)) {
-      if (!all(vline.after %in% (idv <- (0L - use.row):ncol(x))))
+      if (!all(vline.after %in% (idv <- (0L - use.row):nn)))
         stop("Column", 
              if (length(idx <- which(!vline.after %in% idv)) > 1L) "s",
              " ", paste(idx, collapse = ","), 
@@ -24,15 +30,14 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
              min(idv), ":", max(idv), ").",
              if (-1 %in% vline.after & !use.row) 
                " Please use `use.dims = TRUE` or `use.dims = \"row\"`")
-      alignc <- character(2L * (ncol(x) + use.row) + 1L)
+      alignc <- character(2L * NN + 1L)
       alignc[seq(2L, length(alignc), by = 2L)] <- "r"
       alignc[alignc == ""][which(idv %in% vline.after)] <- "|"
     }
     align <- paste(alignc, collapse = "")
   } else {
-    if (nchar(gsub("|", "", align, fixed = TRUE)) != ncol(x) + use.row)
-      stop("You specified ", nchar(align), " alignments for ", 
-           ncol(x) + use.row, " columns.")
+    if (nchar(gsub("|", "", align, fixed = TRUE)) != NN)
+      stop("You specified ", nchar(align), " alignments for ", NN, " columns.")
     if (nchar(gsub("[lrc|]|p\\{[0-9.a-z]*\\}", "", align)) > 0)
       stop("Invalid `align` specification: ", align)
     if (grepl("|", align, fixed = TRUE) && length(vline.after))
@@ -48,8 +53,6 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
     stop("Invalid float placement options: ", 
          paste(unique(placement_spl[!idx]), collapse = ", "))
   
-  mm <- nrow(x)
-  MM <- mm + use.col
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
