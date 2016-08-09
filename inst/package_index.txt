@@ -1,0 +1,40 @@
+PACKAGE INDEX
+
+/SECTION I - FUNCTIONS :: FILES\
+
+//EXPORTED FUNCTIONS\\
+- get_label_count :: R/utils.R
+- reset_label_count :: R/utils.R
+- test.texr :: R/test.texr.R
+- tex :: R/tex.R
+
+//INTERNAL FUNCTIONS\\
+- list_to_text :: R/utils.R
+- test :: R/test.texr.R
+- tex.matrix :: R/tex.R
+- .onLoad :: R/onLoad.R
+- .tex.row :: R/tex.R
+- %+% :: R/utils.R
+
+
+/SECTION II - FILES :: FUNCTIONS\
+[*] means internal/unexported
+[^] means S3 generic
+
+//onLoad.R\\
+- .onLoad [*]
+
+//test.texr.R\\
+- test.texr
+- test [*]
+
+//tex.R\\
+- tex [^]
+- tex.matrix [*]
+- .tex_row [*]
+
+//utils.R\\
+- %+% [*]
+- list_to_text [*]
+- reset_label_count
+- get_label_count

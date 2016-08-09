@@ -3,11 +3,19 @@ tex <- function(...) {
   UseMethod("tex")
 }
 
-tex.matrix <- function(x, use.dims = TRUE, align = NULL, 
-                       label = NULL, digits = NULL,
-                       caption = NULL, hline.after = integer(0L),
-                       vline.after = integer(0L), na.char = "",
-                       file = "", placement = "") {
+tex.matrix <- function(x, options = getOption("texr.params")) {
+  if (!is.list(options) || is.null(names(options)) || any(names(options) == ""))
+    stop("`options` must be a named `list`")
+  opt_names <- names(.global$default_params)
+  if (any(ido <- !names(options) %in% opt_names)) 
+    warning("Option values not recognized: ", 
+            paste(names(options)[ido], collapse = ","))
+  #no need to evaluate `getOption` twice if `options` unchanged
+  if (!deparse(substitute(options)) == 'getOption("texr.params")') {
+    opts <- getOption("texr.params")
+    opts[names(options)] <- options
+  } else { opts <- options }
+  for (ii in names(opts)) assign(ii, opts[[ii]], envir = environment())
   mm <- nrow(x)
   nn <- ncol(x)
   
