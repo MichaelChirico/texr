@@ -18,9 +18,9 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
       if (!all(vline.after %in% (idv <- (0L - use.row):ncol(x))))
         stop("Column", 
              if (length(idx <- which(!vline.after %in% idv)) > 1L) "s",
-             paste(idx, collapse = ","), 
+             " ", paste(idx, collapse = ","), 
              if (length(idx) > 1L) " are" else " is", 
-             "outside this table's range (",
+             " outside this table's range (",
              min(idv), ":", max(idv), ").",
              if (-1 %in% vline.after & !use.row) 
                " Please use `use.dims = TRUE` or `use.dims = \"row\"`")
@@ -49,7 +49,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
          paste(unique(placement_spl[!idx]), collapse = ", "))
   
   mm <- nrow(x)
-  MM <- nrow(x) + use.col
+  MM <- mm + use.col
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
@@ -61,6 +61,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
       "\\begin{tabular}{" %+% align %+% "}",
       "\\end{tabular}",
       "\\end{table}")
+  x[is.na(x)] <- na.char
   mrows <- apply(x, 1L, .tex_row)
   if (use.row) mrows <- rown %+% " & " %+% mrows
   if (use.col) mrows <- c(paste0(if (use.row) " & ", .tex_row(coln)), mrows)

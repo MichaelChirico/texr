@@ -80,20 +80,25 @@ test("tex.vlineafter.4", tex(m, use.dims = FALSE, vline.after = -1),
      error = "Please use.*row")
      
 #test na.char
-# ****NOT YET IMPLEMENTED****
+m.na <- matrix(nrow = 2, ncol = 2)
+test("tex.nachar.1", tex(m.na, na.char = "NA"),
+     c("\\begin{table}[]", "\\caption{Matrix: m.na}", "\\label{tbl:18}", 
+       "\\centering", "\\begin{tabular}{rrr}",
+      " & 1 & 2 \\\\", "1 & NA & NA \\\\", 
+      "2 & NA & NA \\\\", "\\end{tabular}", "\\end{table}"))
 
 #test file
 ff <- tempfile()
 tex(m, file = ff)
 test("tex.file.1", readLines(ff), 
-     c("\\begin{table}[]", "\\caption{Matrix: m}", "\\label{tbl:18}", 
+     c("\\begin{table}[]", "\\caption{Matrix: m}", "\\label{tbl:19}", 
        "\\centering", "\\begin{tabular}{rrr}", 
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
        
 #test placement: validity and functionality
 test("tex.placement.1", tex(m, placement = "!htbp"),
-     c("\\begin{table}[!htbp]", "\\caption{Matrix: m}", "\\label{tbl:17}", 
+     c("\\begin{table}[!htbp]", "\\caption{Matrix: m}", "\\label{tbl:20}", 
        "\\centering", "\\begin{tabular}{rrr}",
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
