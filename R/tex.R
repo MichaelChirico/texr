@@ -4,18 +4,19 @@ tex <- function(...) {
 }
 
 tex.matrix <- function(x, options = getOption("texr.params")) {
-  if (!is.list(options) || is.null(names(options)) || any(names(options) == ""))
+  opt_names <- names(options)
+  if (!is.list(options) || is.null(opt_names) || any(opt_names == ""))
     stop("`options` must be a named `list`")
-  opt_names <- names(.global$default_params)
-  if (any(ido <- !names(options) %in% opt_names)) 
+  if (any(ido <- !opt_names %in% .global$param_names)) 
     warning("Option values not recognized: ", 
-            paste(names(options)[ido], collapse = ","))
+            paste(opt_names[ido], collapse = ","))
   #no need to evaluate `getOption` twice if `options` unchanged
   if (!deparse(substitute(options)) == 'getOption("texr.params")') {
     opts <- getOption("texr.params")
-    opts[names(options)] <- options
+    opts[opt_names] <- options
   } else { opts <- options }
-  for (ii in names(opts)) assign(ii, opts[[ii]], envir = environment())
+  for (oo in .global$param_names) assign(oo, opts[[oo]], envir = environment())
+  
   mm <- nrow(x)
   nn <- ncol(x)
   
@@ -55,9 +56,12 @@ tex.matrix <- function(x, options = getOption("texr.params")) {
       warning("Attempt to specify vertical lines both with `vline.after` ",
               "and within `align`; ignoring `vline.after`")
   }
+  
   if (is.null(caption)) 
     caption <- paste("Matrix:", deparse(substitute(x)))
+  
   if (is.null(label)) label <- "tbl:" %+% .global$label_count
+  
   if (!all(idx <- (placement_spl <- 
             strsplit(placement, split = "", fixed = TRUE)[[1L]]) %in% 
            c("!", "h", "t", "b", "p")))
@@ -70,18 +74,37 @@ tex.matrix <- function(x, options = getOption("texr.params")) {
                  "ignoring supplied `digits` argument.")
   }
   
+  if (caption.placement %in% c("top", "above")) {
+    cap.above <- TRUE
+  } else {
+    if (caption.placement %in% c("bottom", "below")) {
+      cap.above <- FALSE
+    } else 
+      stop("Invalid `caption.placement`; valid values are `\"top\"`, " %+% 
+             "`\"bottom\"`, `\"above\"`, and `\"below\"`.")
+  }
+  
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
-  out[c(1L:5L, ll - 1L, ll)] <- 
+  #begin{table}, begin{tabular}, \centering go to slots:
+  tab.c.tabu.ind <- 
+    c(1L, 2L:3L + 2L * cap.above, ll - 1L - 2L * (!cap.above), ll)
+  #caption{} and label{} go into slots:
+  cap.lab.ind <- if (cap.above) 2L:3L else ll - 2L:1L
+  
+  out[tab.c.tabu.ind] <- 
     c("\\begin{table}[" %+% placement %+% "]",
-      "\\caption{" %+% caption %+% "}",
-      "\\label{" %+% label %+% "}",
       "\\centering",
       "\\begin{tabular}{" %+% align %+% "}",
       "\\end{tabular}",
       "\\end{table}")
+  out[cap.lab.ind] <- 
+    c("\\caption{" %+% caption %+% "}",
+      "\\label{" %+% label %+% "}")
+  
   x[is.na(x)] <- na.char
+  
   mrows <- apply(x, 1L, .tex_row)
   if (use.row) mrows <- rown %+% " & " %+% mrows
   if (use.col) mrows <- c(paste0(if (use.row) " & ", .tex_row(coln)), mrows)
@@ -100,7 +123,7 @@ tex.matrix <- function(x, options = getOption("texr.params")) {
     tbody <- tbody[tbody != ""]
   } else 
     tbody <- mrows
-  out[6L:(ll - 2L)] <- tbody
+  out[4L:(ll - 4L) + 2L * cap.above] <- tbody
   cat(out, sep = "\n", file = file)
   invisible(out)
 }

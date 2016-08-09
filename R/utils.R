@@ -14,7 +14,8 @@ setPackageName("texr", .global)
   list(use.dims = TRUE, align = NULL, label = NULL,
        digits = NULL, caption = NULL, hline.after = integer(0L),
        vline.after = integer(0L), na.char = "", file = "", 
-       placement = "")
+       placement = "ht", caption.placement = "above")
+.global$param_names <- names(.global$default_params)
 
 #Label Counter & Reset Function
 #increments by 1 each `tex()` call
