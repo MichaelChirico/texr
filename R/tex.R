@@ -30,10 +30,12 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
     }
     align <- paste(alignc, collapse = "")
   } else {
-    if (nchar(align) != ncol(x) + use.row)
+    if (nchar(gsub("|", "", align, fixed = TRUE)) != ncol(x) + use.row)
       stop("You specified ", nchar(align), " alignments for ", 
            ncol(x) + use.row, " columns.")
-    if (grepl("|", align, fixed = TRUE) & length(vline.after))
+    if (nchar(gsub("[lrc|]|p\\{[0-9.a-z]*\\}", "", align)) > 0)
+      stop("Invalid `align` specification: ", align)
+    if (grepl("|", align, fixed = TRUE) && length(vline.after))
       warning("Attempt to specify vertical lines both with `vline.after` ",
               "and within `align`; ignoring `vline.after`")
   }
@@ -61,10 +63,7 @@ tex.matrix <- function(x, use.dims = TRUE, align = NULL,
       "\\end{table}")
   mrows <- apply(x, 1L, .tex_row)
   if (use.row) mrows <- rown %+% " & " %+% mrows
-  if (use.col){
-    if (use.row) mrows <- c(" & " %+% .tex_row(coln), mrows)
-    else mrows <- c(.tex_row(coln), mrows)
-  }
+  if (use.col) mrows <- c(paste0(if (use.row) " & ", .tex_row(coln)), mrows)
   if (length(hline.after)) {
     if (!all(hline.after %in% (idc <- (0L - use.col):mm)))
       stop("Row", if (length(idx <- which(!vline.after %in% idv)) > 1L) "s",

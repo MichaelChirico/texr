@@ -6,8 +6,37 @@ test <- texr:::test
 
 m <- matrix(1:4, nrow = 2, ncol = 2)
 reset_label_count()
+#test the simplest output
 test("texmatrix.VALUE.1", tex(m), 
      c("\\begin{table}[]", "\\caption{Matrix: m}", 
        "\\label{tbl:1}", "\\centering", "\\begin{tabular}{rrr}", 
        " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
        "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
+   
+#test use.dims: accepts FALSE, "row", or "col"
+test("tex.usedims.1", tex(m, use.dims = FALSE),
+     c("\\begin{table}[]", "\\caption{Matrix: m}", "\\label{tbl:2}", 
+       "\\centering", "\\begin{tabular}{rr}", "1 & 3 \\\\", "2 & 4 \\\\", 
+       "\\end{tabular}", "\\end{table}"))
+       
+test("tex.usedims.2", tex(m, use.dims = "row"),
+     c("\\begin{table}[]", "\\caption{Matrix: m}", "\\label{tbl:3}", 
+       "\\centering", "\\begin{tabular}{rrr}", 
+       "1 & 1 & 3 \\\\", "2 & 2 & 4 \\\\", 
+       "\\end{tabular}", "\\end{table}"))
+       
+test("tex.usedims.3", tex(m, use.dims = "col"),
+     c("\\begin{table}[]", "\\caption{Matrix: m}", "\\label{tbl:4}", 
+       "\\centering", "\\begin{tabular}{rr}", "1 & 2 \\\\", "1 & 3 \\\\", 
+       "2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
+
+#test align: check validity and functionality
+test("tex.align.1", tex(m, align = "lcr"),
+     c("\\begin{table}[]", "\\caption{Matrix: m}", "\\label{tbl:5}", 
+       "\\centering", "\\begin{tabular}{lcr}",
+       " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
+       "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{table}"))
+       
+test("tex.align.2", tex(m, align = "R&s"), error = "^Invalid")
+
+test("tex.align.3", tex(m, align = "rrrr"), error = "^You specified")
