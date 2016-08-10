@@ -158,9 +158,9 @@ test("tex.floatingenvironment.1", tex(m, floating.environment = "sidewaystable")
        
 options("texr.warn.rotating" = TRUE)
 options("texr.warn.rotating.toggle" = TRUE)
-#seems I can't suppress the message output here...
+##seems I can't suppress the message output here...
 capture.output(tex(m, floating.environment = "sidewaystable"))
-#running tex again SHOULDN'T produce a message with these options
+##running tex again SHOULDN'T produce a message with these options
 test("tex.floatingenvironment.2", 
      tryCatch(tex(m, floating.environment = "sidewaystable"), warning = identity),
      c("\\begin{sidewaystable}[ht]", "\\caption{Matrix: m}", "\\label{tbl:36}", 
@@ -171,12 +171,12 @@ options("texr.warn.rotating" = TRUE)
 options("texr.warn.rotating.toggle" = FALSE)
 test("tex.floatingenvironment.3", tex(m, floating.environment = "sidewaystable"),
      message = "Remember to include.*rotating")
-#running tex again SHOULD produce a message with these options
+##running tex again SHOULD produce a message with these options
 test("tex.floatingenvironment.4", tex(m, floating.environment = "sidewaystable"),
      message = "Remember to include.*rotating")
      
 options("texr.warn.rotating" = FALSE)
-#again, no message should be produced
+##again, no message should be produced
 test("tex.floatingenvironment.5", 
      tryCatch(tex(m, floating.environment = "sidewaystable"), warning = identity),
      c("\\begin{sidewaystable}[ht]", "\\caption{Matrix: m}", "\\label{tbl:39}", 
@@ -185,6 +185,17 @@ test("tex.floatingenvironment.5",
 #reset to user's options
 options("texr.warn.rotating" = old_rotate)
 options("texr.warn.rotating.toggle" = old_rot_tog)
+     
+#test only.body functionality
+test("tex.onlybody.1", tex(m, only.body = TRUE), 
+     c("", "", "", "", "", " & 1 & 2 \\\\",
+       "1 & 1 & 3 \\\\", "2 & 2 & 4 \\\\", "", ""))
+     
+#test line.ends functionality
+test("tex.lineends.1", tex(m, line.ends = FALSE),
+     c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:41}", 
+       "\\centering", "\\begin{tabular}{rrr}", " & 1 & 2", "1 & 1 & 3", 
+       "2 & 2 & 4", "\\end{tabular}", "\\end{table}"))
      
 # ***TESTS OF reset_label_count, get_label_count***
      

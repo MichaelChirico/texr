@@ -101,27 +101,31 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing
   out <- character(ll <- MM + length(hline.after) + 7L)
-  #begin{table}, begin{tabular}, \centering go to slots:
-  tab.c.tabu.ind <- 
-    c(1L, 2L:3L + 2L * cap.above, ll - 1L - 2L * (!cap.above), ll)
-  #caption{} and label{} go into slots:
-  cap.lab.ind <- if (cap.above) 2L:3L else ll - 2L:1L
-  
-  out[tab.c.tabu.ind] <- 
-    c("\\begin{" %+% floating.environment %+% "}[" %+% placement %+% "]",
-      "\\centering",
-      "\\begin{tabular}{" %+% align %+% "}",
-      "\\end{tabular}",
-      "\\end{" %+% floating.environment %+% "}")
-  out[cap.lab.ind] <- 
-    c("\\caption{" %+% caption %+% "}",
-      "\\label{" %+% label %+% "}")
+  if (!only.body) {
+    #begin{table}, begin{tabular}, \centering go to slots:
+    tab.c.tabu.ind <- 
+      c(1L, 2L:3L + 2L * cap.above, ll - 1L - 2L * (!cap.above), ll)
+    #caption{} and label{} go into slots:
+    cap.lab.ind <- if (cap.above) 2L:3L else ll - 2L:1L
+    
+    out[tab.c.tabu.ind] <- 
+      c("\\begin{" %+% floating.environment %+% "}[" %+% placement %+% "]",
+        "\\centering",
+        "\\begin{tabular}{" %+% align %+% "}",
+        "\\end{tabular}",
+        "\\end{" %+% floating.environment %+% "}")
+    out[cap.lab.ind] <- 
+      c("\\caption{" %+% caption %+% "}",
+        "\\label{" %+% label %+% "}")
+  }
   
   x[is.na(x)] <- na.char
   
-  mrows <- apply(x, 1L, .tex_row)
+  mrows <- apply(x, 1L, .tex_row) %+% (if (line.ends) " \\\\")
   if (use.row) mrows <- rown %+% " & " %+% mrows
-  if (use.col) mrows <- c(paste0(if (use.row) " & ", .tex_row(coln)), mrows)
+  if (use.col) mrows <- 
+    c(paste0(if (use.row) " & ", .tex_row(coln), 
+             if (line.ends) " \\\\"), mrows)
   if (length(hline.after)) {
     if (!all(hline.after %in% (idc <- (0L - use.col):mm)))
       stop("Row", if (length(idx <- which(!hline.after %in% idc)) > 1L) "s",
@@ -138,10 +142,8 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
   } else 
     tbody <- mrows
   out[4L:(ll - 4L) + 2L * cap.above] <- tbody
-  cat(out, sep = "\n", file = file)
+  cat(out[!out == ""], sep = "\n", file = file)
   invisible(out)
 }
 
-.tex_row <- function(x) {
-  paste(x, collapse = " & ") %+% " \\\\"
-}
+.tex_row <- function(x) paste(x, collapse = " & ")
