@@ -196,6 +196,13 @@ test("tex.lineends.1", tex(m, line.ends = FALSE),
      c("\\begin{table}[ht]", "\\caption{Matrix: m}", "\\label{tbl:41}", 
        "\\centering", "\\begin{tabular}{rrr}", " & 1 & 2", "1 & 1 & 3", 
        "2 & 2 & 4", "\\end{tabular}", "\\end{table}"))
+       
+#test line.split functionality
+test("tex.linesplit.1", capture.output(tex(m, line.split = "\n\n")),
+     c("\\begin{table}[ht]", "", "\\caption{Matrix: m}", "", "\\label{tbl:42}", 
+       "", "\\centering", "", "\\begin{tabular}{rrr}", "", " & 1 & 2 \\\\", 
+       "", "1 & 1 & 3 \\\\", "", "2 & 2 & 4 \\\\", "", "\\end{tabular}", 
+       "", "\\end{table}"))
      
 # ***TESTS OF reset_label_count, get_label_count***
      

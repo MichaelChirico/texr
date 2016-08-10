@@ -15,7 +15,7 @@ setPackageName("texr", .global)
        vline.after = NULL, na.char = "", file = "", 
        placement = "ht", caption.placement = "above",
        floating.environment = "table", only.body = FALSE,
-       line.ends = TRUE)
+       line.ends = TRUE, line.split = "\n")
 .global$param_names <- names(.global$default_params)
 
 #Label Counter & Reset Function

@@ -142,7 +142,7 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
   } else 
     tbody <- mrows
   out[4L:(ll - 4L) + 2L * cap.above] <- tbody
-  cat(out[!out == ""], sep = "\n", file = file)
+  cat(out[!out == ""], sep = line.split, file = file)
   invisible(out)
 }
 
