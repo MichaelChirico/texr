@@ -12,6 +12,7 @@ PACKAGE INDEX
 - list_to_text :: R/utils.R
 - test :: R/test.texr.R
 - tex.matrix :: R/tex.R
+- tex.table :: R/tex.R
 - .onLoad :: R/onLoad.R
 - .tex.row :: R/tex.R
 - .warn_rotate :: R/utils.R
@@ -32,6 +33,7 @@ PACKAGE INDEX
 //tex.R\\
 - tex [^]
 - tex.matrix [*]
+- tex.table [*]
 - .tex_row [*]
 
 //utils.R\\

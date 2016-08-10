@@ -5,3 +5,4 @@ export(reset_label_count, get_label_count)
 export(test.texr)
 
 S3method("tex", matrix)
+S3method("tex", table)

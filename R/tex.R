@@ -146,4 +146,33 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
   invisible(out)
 }
 
+tex.table <- function(x, options = getOption("texr.params"), ...) {
+  ndim <- length(dim(x))
+  mcall <- match.call()
+  if ("caption" %in% names(mcall)) caption <- list(...)$caption
+  else caption <- options$caption
+  
+  if ("hline.after" %in% names(mcall)) hline.after <- list(...)$hline.afer
+  else hline.after <- options$hline.after
+  
+  if ("vline.after" %in% names(mcall)) vline.after <- list(...)$vline.afer
+  else vline.after <- options$vline.after
+  
+  if (ndim > 2L) stop("Support for 3+ -dimensional tables not implemented.")
+  if (ndim == 1L) 
+    tex.matrix(t(as.matrix(x)), use.dims = "col", 
+               caption = 
+                 if (is.null(caption)) "Table: " %+% deparse(substitute(x))
+               else caption, 
+               hline.after = if (is.null(hline.after)) 0L else hline.after,
+               vline.after = if (is.null(vline.after)) 0L else vline.after, ...)
+  else
+    tex.matrix(as.matrix(x), use.dims = TRUE, 
+               caption = 
+                 if (is.null(caption)) "Table: " %+% deparse(substitute(x))
+               else caption, 
+               hline.after = if (is.null(hline.after)) 0L else hline.after,
+               vline.after = if (is.null(vline.after)) 0L else vline.after, ...)
+}
+
 .tex_row <- function(x) paste(x, collapse = " & ")
