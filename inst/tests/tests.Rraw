@@ -144,6 +144,48 @@ test("tex.captionplacement.3", tex(m, caption.placement = "top"),
 test("tex.captionplacement.4", tex(m, caption.placement = "xxx"),
      error = "Invalid.*caption\\.placement")
      
+#test floating.environment: functionality & options
+##store user's initial value of "texr.warn.rotating"
+##  so that running tests doesn't tinker with their settings
+old_rotate <- getOption("texr.warn.rotating")
+old_rot_tog <- getOption("texr.warn.rotating.toggle")
+
+options("texr.warn.rotating" = FALSE)
+test("tex.floatingenvironment.1", tex(m, floating.environment = "sidewaystable"),
+     c("\\begin{sidewaystable}[ht]", "\\caption{Matrix: m}", "\\label{tbl:34}", 
+       "\\centering", "\\begin{tabular}{rrr}", " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
+       "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{sidewaystable}"))
+       
+options("texr.warn.rotating" = TRUE)
+options("texr.warn.rotating.toggle" = TRUE)
+#seems I can't suppress the message output here...
+capture.output(tex(m, floating.environment = "sidewaystable"))
+#running tex again SHOULDN'T produce a message with these options
+test("tex.floatingenvironment.2", 
+     tryCatch(tex(m, floating.environment = "sidewaystable"), warning = identity),
+     c("\\begin{sidewaystable}[ht]", "\\caption{Matrix: m}", "\\label{tbl:36}", 
+       "\\centering", "\\begin{tabular}{rrr}", " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
+       "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{sidewaystable}"))
+
+options("texr.warn.rotating" = TRUE)
+options("texr.warn.rotating.toggle" = FALSE)
+test("tex.floatingenvironment.3", tex(m, floating.environment = "sidewaystable"),
+     message = "Remember to include.*rotating")
+#running tex again SHOULD produce a message with these options
+test("tex.floatingenvironment.4", tex(m, floating.environment = "sidewaystable"),
+     message = "Remember to include.*rotating")
+     
+options("texr.warn.rotating" = FALSE)
+#again, no message should be produced
+test("tex.floatingenvironment.5", 
+     tryCatch(tex(m, floating.environment = "sidewaystable"), warning = identity),
+     c("\\begin{sidewaystable}[ht]", "\\caption{Matrix: m}", "\\label{tbl:39}", 
+       "\\centering", "\\begin{tabular}{rrr}", " & 1 & 2 \\\\", "1 & 1 & 3 \\\\", 
+       "2 & 2 & 4 \\\\", "\\end{tabular}", "\\end{sidewaystable}"))
+#reset to user's options
+options("texr.warn.rotating" = old_rotate)
+options("texr.warn.rotating.toggle" = old_rot_tog)
+     
 # ***TESTS OF reset_label_count, get_label_count***
      
 test("resetlabelcount.VALUE.1", reset_label_count(), 0L)

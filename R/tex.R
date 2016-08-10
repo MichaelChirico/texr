@@ -1,6 +1,5 @@
 tex <- function(...) {
   .global$label_count <- .global$label_count + 1L
-  if (floating.environment == "sidewaystable") .warn_rotate()
   UseMethod("tex")
 }
 
@@ -96,6 +95,8 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
       stop("Invalid `caption.placement`; valid values are `\"top\"`, " %+% 
              "`\"bottom\"`, `\"above\"`, and `\"below\"`.")
   }
+  
+  if (floating.environment == "sidewaystable") .warn_rotate()
 
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing

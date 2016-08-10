@@ -39,3 +39,4 @@ PACKAGE INDEX
 - list_to_text [*]
 - reset_label_count
 - get_label_count
+- .warn_rotate [*]

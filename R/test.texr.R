@@ -9,7 +9,7 @@ test.texr <- function(...) {
              envir = new.env(parent = .GlobalEnv))
 }
 
-test <- function(name, x, y, error, warning) {
+test <- function(name, x, y, error, warning, message) {
   #Extra spaces since \r moves the cursor to the beginning of
   #  the line, but doesn't erase the current text in the line --
   #  so new text only overwrites old text if it's wider. 
@@ -18,7 +18,8 @@ test <- function(name, x, y, error, warning) {
   #since most of the package is about using `cat`,
   #  which supersedes output suppression through `invisible`
   capture.output(
-    x.catch <- tryCatch(x, error = identity, warning = identity)
+    x.catch <- tryCatch(x, error = identity, 
+                        warning = identity, message = identity)
   )
   if (inherits(x.catch, "error")) {
     if (missing(error)) {
@@ -41,6 +42,18 @@ test <- function(name, x, y, error, warning) {
     }
     if (grepl(warning, x.catch$message)) return()
     cat("\nExpected warning matching '", error, 
+        "', but returned '", x.catch$message, "'.\n", sep = "")
+    return()
+  }
+  if (inherits(x.catch, "message")) {
+    if (missing(message)) {
+      cat("\n`", deparse(substitute(x)),
+          "` produced an unanticipated message: '",
+          x.catch$message, "'.\n", sep = "")
+      return()
+    }
+    if (grepl(message, x.catch$message)) return()
+    cat("\nExpected message matching '", error, 
         "', but returned '", x.catch$message, "'.\n", sep = "")
     return()
   }
