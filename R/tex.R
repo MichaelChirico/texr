@@ -243,7 +243,38 @@ tex.lm <- function(x, options = getOption("texr.params"),
 }
 
 tex.list <- function(ll, options = getOption("texr.params"), ...) {
+  dots <- list(...)
+  if (length(dots)) {
+    if (!missing(options)) stop("Please use `options` alone or don't use it.")
+    
+    dot_names <- names(dots)
+    opts <- getOption("texr.params")
+    if (any(ido <- !dot_names %in% .global$param_names)) 
+    warning("Option values not recognized: ", 
+            paste(dot_names[ido], collapse = ","))
+    opts[dot_names] <- dots
+  } else {
+    opt_names <- names(options)
+    if (!is.list(options) || is.null(opt_names) || any(opt_names == ""))
+      stop("`options` must be a named `list`")
+    if (any(ido <- !opt_names %in% .global$param_names)) 
+      warning("Option values not recognized: ", 
+              paste(opt_names[ido], collapse = ","))
+    #no need to evaluate `getOption` twice if `options` unchanged
+    if (!deparse(substitute(options)) == 'getOption("texr.params")') {
+      opts <- getOption("texr.params")
+      opts[opt_names] <- options
+    } else { opts <- options }
+  }
   
+  inner.opts.names <- c("only.body", "line.ends", "use.dims")
+  inner.opts <- opts[inner.opts.names]
+
+  opts[inner.opts.names] <- list(TRUE, FALSE, FALSE)
+  opts$only.body <- TRUE
+  opts$line.ends <- FALSE
+  
+  lapply(ll, tex, options = opts)
 }
 
 .tex_row <- function(x) paste(x, collapse = " & ")
