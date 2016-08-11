@@ -6,3 +6,4 @@ export(test.texr)
 
 S3method("tex", matrix)
 S3method("tex", table)
+S3method("tex", lm)

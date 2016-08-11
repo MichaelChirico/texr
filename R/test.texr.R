@@ -33,6 +33,11 @@ test <- function(name, x, y, error, warning, message) {
         "', but returned '", x.catch$message, "'.\n", sep = "")
     return()
   }
+  if (!missing(error)) {
+    cat("\nExpected error matching '", error,
+        "', but returned no error.\n", sep = "")
+    return()
+  }
   if (inherits(x.catch, "warning")) {
     if (missing(warning)) {
       cat("\n`", deparse(substitute(x)),
@@ -45,6 +50,11 @@ test <- function(name, x, y, error, warning, message) {
         "', but returned '", x.catch$message, "'.\n", sep = "")
     return()
   }
+  if (!missing(warning)) {
+    cat("\nExpected warning matching '", warning,
+        "', but returned no warning.\n", sep = "")
+    return()
+  }
   if (inherits(x.catch, "message")) {
     if (missing(message)) {
       cat("\n`", deparse(substitute(x)),
@@ -55,6 +65,11 @@ test <- function(name, x, y, error, warning, message) {
     if (grepl(message, x.catch$message)) return()
     cat("\nExpected message matching '", error, 
         "', but returned '", x.catch$message, "'.\n", sep = "")
+    return()
+  }
+  if (!missing(message)) {
+    cat("\nExpected message matching '", message,
+        "', but returned no message.\n", sep = "")
     return()
   }
   if (identical(x.catch, y)) return()

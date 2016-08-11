@@ -44,7 +44,6 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
   MM <- mm + use.col
   
   if (is.null(align)) {
-    alignc <- rep("r", NN)
     if (length(vline.after)) {
       if (!all(vline.after %in% (idv <- (0L - use.row):nn)))
         stop("Column", 
@@ -57,7 +56,7 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
       alignc <- character(2L * NN + 1L)
       alignc[seq(2L, length(alignc), by = 2L)] <- "r"
       alignc[alignc == ""][which(idv %in% vline.after)] <- "|"
-    }
+    } else alignc <- rep("r", NN)
     align <- paste(alignc, collapse = "")
   } else {
     if (nchar(gsub("|", "", align, fixed = TRUE)) != NN)
@@ -173,6 +172,68 @@ tex.table <- function(x, options = getOption("texr.params"), ...) {
                else caption, 
                hline.after = if (is.null(hline.after)) 0L else hline.after,
                vline.after = if (is.null(vline.after)) 0L else vline.after, ...)
+}
+
+tex.lm <- function(x, options = getOption("texr.params"), 
+                   model.name = "Model", ...) {
+  dots <- list(...)
+  if (length(dots)) {
+    if (!missing(options)) stop("Please use `options` alone or don't use it.")
+    
+    dot_names <- names(dots)
+    opts <- getOption("texr.params")
+    if (any(ido <- !dot_names %in% .global$param_names)) 
+    warning("Option values not recognized: ", 
+            paste(dot_names[ido], collapse = ","))
+    opts[dot_names] <- dots
+  } else {
+    opt_names <- names(options)
+    if (!is.list(options) || is.null(opt_names) || any(opt_names == ""))
+      stop("`options` must be a named `list`")
+    if (any(ido <- !opt_names %in% .global$param_names)) 
+      warning("Option values not recognized: ", 
+              paste(opt_names[ido], collapse = ","))
+    #no need to evaluate `getOption` twice if `options` unchanged
+    if (!deparse(substitute(options)) == 'getOption("texr.params")') {
+      opts <- getOption("texr.params")
+      opts[opt_names] <- options
+    } else { opts <- options }
+  }
+  for (oo in .global$param_names) assign(oo, opts[[oo]], envir = environment())
+
+  use.row <- isTRUE(use.dims) || use.dims == "row"
+  use.col <- (isTRUE(use.dims) || use.dims == "col") && !is.null(model.name)
+  
+  if (is.null(caption)) 
+    opts$caption <- paste("Regression:", deparse(substitute(x)))
+  
+  if (is.null(label)) opts$label <- "reg:" %+% .global$label_count
+ 
+  lmsum <- summary(x)
+  
+  if (!is.null(digits)) {
+    coefs <- round(lmsum$coefficients[ , "Estimate"], digits)
+    ses <- round(lmsum$coefficients[ , "Std. Error"], digits)
+    opts$digits <- NULL
+  } else {
+    coefs <- lmsum$coefficients[ , "Estimate"]
+    ses <- lmsum$coefficients[ , "Std. Error"]
+  }
+  
+  MM <- 2L * length(coefs)
+  coef.ind <- seq(1L, by = 2L, length.out = length(coefs))
+  
+  if (use.row) {
+    rown <- character(MM)
+    rown[coef.ind] <- names(coefs)
+  } else rown <- NULL
+  
+  out <- matrix("", nrow = MM, 
+                dimnames = list(rown, if (use.col) model.name))
+  out[coef.ind] <- coefs
+  out[coef.ind + 1L] <- "(" %+% ses %+% ")"
+  
+  tex.matrix(out, options = opts)
 }
 
 .tex_row <- function(x) paste(x, collapse = " & ")
