@@ -14,6 +14,7 @@ PACKAGE INDEX
 - tex.lm :: R/tex.R
 - tex.matrix :: R/tex.R
 - tex.table :: R/tex.R
+- .clean_coef :: R/tex.R
 - .onLoad :: R/onLoad.R
 - .tex.row :: R/tex.R
 - .warn_rotate :: R/utils.R
@@ -37,6 +38,7 @@ PACKAGE INDEX
 - tex.table [*]
 - tex.lm [*]
 - .tex_row [*]
+- .clean_coef [*]
 
 //utils.R\\
 - %+% [*]

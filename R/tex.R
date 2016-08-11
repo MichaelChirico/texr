@@ -175,7 +175,8 @@ tex.table <- function(x, options = getOption("texr.params"), ...) {
 }
 
 tex.lm <- function(x, options = getOption("texr.params"), 
-                   model.name = "Model", ...) {
+                   model.name = "Model", include.se = TRUE, 
+                   clean.intercept = TRUE, ...) {
   dots <- list(...)
   if (length(dots)) {
     if (!missing(options)) stop("Please use `options` alone or don't use it.")
@@ -213,27 +214,34 @@ tex.lm <- function(x, options = getOption("texr.params"),
   
   if (!is.null(digits)) {
     coefs <- round(lmsum$coefficients[ , "Estimate"], digits)
-    ses <- round(lmsum$coefficients[ , "Std. Error"], digits)
+    if (include.se) ses <- round(lmsum$coefficients[ , "Std. Error"], digits)
+    #to prevent attempted rounding by tex.matrix
     opts$digits <- NULL
   } else {
     coefs <- lmsum$coefficients[ , "Estimate"]
-    ses <- lmsum$coefficients[ , "Std. Error"]
+    if (include.se) ses <- lmsum$coefficients[ , "Std. Error"]
   }
   
-  MM <- 2L * length(coefs)
-  coef.ind <- seq(1L, by = 2L, length.out = length(coefs))
+  MM <- (1L + include.se) * length(coefs)
+  coef.ind <- seq(1L, by = (1L + include.se), length.out = length(coefs))
   
   if (use.row) {
     rown <- character(MM)
-    rown[coef.ind] <- names(coefs)
+    rown[coef.ind] <- .clean_coef(x, clean.intercept)
   } else rown <- NULL
   
   out <- matrix("", nrow = MM, 
                 dimnames = list(rown, if (use.col) model.name))
   out[coef.ind] <- coefs
-  out[coef.ind + 1L] <- "(" %+% ses %+% ")"
+  if (include.se) out[coef.ind + 1L] <- "(" %+% ses %+% ")"
   
   tex.matrix(out, options = opts)
 }
 
 .tex_row <- function(x) paste(x, collapse = " & ")
+
+.clean_coef <- function(x, clean.intercept = TRUE, clean.factors = TRUE) {
+  ans <- names(x$coefficients)
+  if (clean.intercept) ans <- gsub("\\(Intercept\\)", "Intercept", ans)
+  ans
+}

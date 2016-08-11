@@ -252,3 +252,52 @@ test("textable.hlineafter.2", tex(twoway, hline.after = integer(0L)),
        "\\centering", "\\begin{tabular}{r|rrrrr}", " & 1 & 2 & 3 & 4 & 5 \\\\", 
        "1 & 5 & 4 & 3 & 2 & 1 \\\\", "2 & 4 & 2 & 2 & 2 & 0 \\\\", 
        "3 & 1 & 2 & 1 & 0 & 1 \\\\", "\\end{tabular}", "\\end{table}"))
+       
+# ***TESTS OF tex.lm***
+reset_label_count()
+reg <- lm(Sepal.Length ~ Sepal.Width + Petal.Length, data = iris)
+
+test("texlm.VALUE.1", tex(reg), 
+     c("\\begin{table}[ht]", "\\caption{Regression: reg}", "\\label{reg:1}", 
+       "\\centering", "\\begin{tabular}{rr}", " & Model \\\\",
+       "Intercept & 2.24914016038323 \\\\", 
+       " & (0.247969626756195) \\\\", "Sepal.Width & 0.595524748743591 \\\\", 
+       " & (0.0693281623349654) \\\\", "Petal.Length & 0.471920039327133 \\\\", 
+       " & (0.0171176790352502) \\\\", "\\end{tabular}", "\\end{table}"))
+       
+test("texlm.modelname.1", tex(reg, model.name = "Iris Regression"),
+     c("\\begin{table}[ht]", "\\caption{Regression: reg}", "\\label{reg:2}", 
+       "\\centering", "\\begin{tabular}{rr}", " & Iris Regression \\\\", 
+       "Intercept & 2.24914016038323 \\\\", " & (0.247969626756195) \\\\", 
+       "Sepal.Width & 0.595524748743591 \\\\", " & (0.0693281623349654) \\\\", 
+       "Petal.Length & 0.471920039327133 \\\\", " & (0.0171176790352502) \\\\", 
+       "\\end{tabular}", "\\end{table}"))
+       
+test("texlm.includese.1", tex(reg, include.se = FALSE),
+     c("\\begin{table}[ht]", "\\caption{Regression: reg}", "\\label{reg:3}", 
+       "\\centering", "\\begin{tabular}{rr}", " & Model \\\\",
+       "Intercept & 2.24914016038323 \\\\", "Sepal.Width & 0.595524748743591 \\\\",
+       "Petal.Length & 0.471920039327133 \\\\", "\\end{tabular}", "\\end{table}"))
+
+test("texlm.cleanintercept.1", tex(reg, clean.intercept = FALSE),
+     c("\\begin{table}[ht]", "\\caption{Regression: reg}", "\\label{reg:4}", 
+       "\\centering", "\\begin{tabular}{rr}", " & Model \\\\",
+       "(Intercept) & 2.24914016038323 \\\\", " & (0.247969626756195) \\\\",
+       "Sepal.Width & 0.595524748743591 \\\\", " & (0.0693281623349654) \\\\", 
+       "Petal.Length & 0.471920039327133 \\\\", " & (0.0171176790352502) \\\\",
+       "\\end{tabular}", "\\end{table}"))
+
+test("texlm.digits.1", tex(reg, digits = 0L),
+     c("\\begin{table}[ht]", "\\caption{Regression: reg}", "\\label{reg:5}", 
+       "\\centering", "\\begin{tabular}{rr}", " & Model \\\\", "Intercept & 2 \\\\", 
+       " & (0) \\\\", "Sepal.Width & 1 \\\\", " & (0) \\\\", "Petal.Length & 0 \\\\", 
+       " & (0) \\\\", "\\end{tabular}", "\\end{table}"))
+
+##One test to verify that options passed through to tex.matrix are working as expected
+test("texlm.hlineafter.1", tex(reg, hline.after = c(0L, 5L)),
+     c("\\begin{table}[ht]", "\\caption{Regression: reg}", "\\label{reg:6}", 
+       "\\centering", "\\begin{tabular}{rr}", " & Model \\\\", "\\hline", 
+       "Intercept & 2.24914016038323 \\\\", " & (0.247969626756195) \\\\", 
+       "Sepal.Width & 0.595524748743591 \\\\", " & (0.0693281623349654) \\\\", 
+       "Petal.Length & 0.471920039327133 \\\\", "\\hline", 
+       " & (0.0171176790352502) \\\\", "\\end{tabular}", "\\end{table}"))
