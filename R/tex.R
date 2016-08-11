@@ -145,6 +145,10 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
   invisible(out)
 }
 
+tex.default <- function(x, ...) {
+  tex.matrix(as.matrix(x), ...)
+}
+
 tex.table <- function(x, options = getOption("texr.params"), ...) {
   ndim <- length(dim(x))
   mcall <- match.call()
@@ -236,6 +240,10 @@ tex.lm <- function(x, options = getOption("texr.params"),
   if (include.se) out[coef.ind + 1L] <- "(" %+% ses %+% ")"
   
   tex.matrix(out, options = opts)
+}
+
+tex.list <- function(ll, options = getOption("texr.params"), ...) {
+  
 }
 
 .tex_row <- function(x) paste(x, collapse = " & ")
