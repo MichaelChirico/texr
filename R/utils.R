@@ -1,8 +1,9 @@
 "%+%" <- function(s1, s2) paste0(s1, s2)
 
 #for eval(parse())-ing a list as text
-list_to_text <- function(x) {
-  out <- paste(capture.output(dput(x)), collapse = "")
+object_to_text <- function(x) {
+  #thanks for improvement: http://stackoverflow.com/questions/38998935
+  out <- paste(deparse(x), collapse = "")
   invisible(out)
 }
 
