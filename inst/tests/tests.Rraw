@@ -188,8 +188,7 @@ options("texr.warn.rotating.toggle" = old_rot_tog)
      
 #test only.body functionality
 test("tex.onlybody.1", tex(m, only.body = TRUE), 
-     c("", "", "", "", "", " & 1 & 2 \\\\",
-       "1 & 1 & 3 \\\\", "2 & 2 & 4 \\\\", "", ""))
+     c(" & 1 & 2 \\\\", "1 & 1 & 3 \\\\", "2 & 2 & 4 \\\\"))
      
 #test line.ends functionality
 test("tex.lineends.1", tex(m, line.ends = FALSE),

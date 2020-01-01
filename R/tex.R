@@ -99,7 +99,7 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
 
   #length-7 padding for table environment set-up,
   #  caption/label printing, and environment closing
-  out <- character(ll <- MM + length(hline.after) + 7L)
+  out <- character(ll <- MM + length(hline.after) + 7L*(!only.body))
   if (!only.body) {
     #begin{table}, begin{tabular}, \centering go to slots:
     tab.c.tabu.ind <- 
@@ -140,8 +140,8 @@ tex.matrix <- function(x, options = getOption("texr.params"), ...) {
     tbody <- tbody[tbody != ""]
   } else 
     tbody <- mrows
-  out[4L:(ll - 4L) + 2L * cap.above] <- tbody
-  cat(out[!out == ""], sep = line.split, file = file)
+  if (only.body) out <- tbody else out[4L:(ll - 4L) + 2L * cap.above] <- tbody
+  cat(out, sep = line.split, file = file)
   invisible(out)
 }
 
@@ -271,16 +271,25 @@ tex.list <- function(ll, options = getOption("texr.params"), ...) {
   inner.opts <- opts[inner.opts.names]
 
   opts[inner.opts.names] <- list(TRUE, FALSE, FALSE)
-  opts$only.body <- TRUE
-  opts$line.ends <- FALSE
   
-  lapply(ll, tex, options = opts)
+  capture.output(tex.body <- lapply(ll, tex, options = opts))
+  
+  #Pad unequal-length objects with ""
+  #**  (Shouldn't do this. Should match based on row names before
+  #**   padding with "").
+  if (diff(range(lens <- lengths(tex.body)))) {
+    LL = max(lens)
+    tex.body[lens != LL] = 
+      lapply(tex.body[lens != LL],
+             function(ee) c(ee, rep.int("", LL - length(ee))))
+  }
+  do.call(paste, c(tex.body, sep = " & "))
 }
 
 .tex_row <- function(x) paste(x, collapse = " & ")
 
 .clean_coef <- function(x, clean.intercept = TRUE, clean.factors = TRUE) {
   ans <- names(x$coefficients)
-  if (clean.intercept) ans <- gsub("\\(Intercept\\)", "Intercept", ans)
+  if (clean.intercept) ans <- gsub("(Intercept)", "Intercept", ans, fixed = TRUE)
   ans
 }
